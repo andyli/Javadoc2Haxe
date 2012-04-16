@@ -1,0 +1,5 @@
+bin/*.js
+
+.DS_Store
+*.pidb
+*.userprefs

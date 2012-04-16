@@ -1,0 +1,22 @@
+-js bin/background.js
+-cp src
+-lib jQueryExtern
+-lib chrome-extension
+-lib casalib
+-main javadoc2haxe.Background
+
+--next
+-js bin/contentscript.js
+-cp src
+-lib jQueryExtern
+-lib chrome-extension
+-lib casalib
+-main javadoc2haxe.ContentScript
+
+--next
+-js bin/javatohaxe.js
+-cp src
+-lib jQueryExtern
+-lib chrome-extension
+-lib casalib
+-main javadoc2haxe.JavaToHaxe

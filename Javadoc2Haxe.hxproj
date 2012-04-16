@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{50F9B0EB-B085-4E9E-9FB7-F02FC19379D4}</ProjectGuid>
+    <TargetHXMLFile>build.hxml</TargetHXMLFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>.</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>.</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="bin\index.html" />
+    <Compile Include="build.hxml" />
+    <Compile Include="bin\manifest.json" />
+    <Compile Include="src\javadoc2haxe\Background.hx" />
+    <Compile Include="src\javadoc2haxe\ContentScript.hx" />
+    <Compile Include="src\javadoc2haxe\Request.hx" />
+    <Compile Include="src\javadoc2haxe\JavaToHaxe.hx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\javadoc2haxe\" />
+  </ItemGroup>
+</Project>
