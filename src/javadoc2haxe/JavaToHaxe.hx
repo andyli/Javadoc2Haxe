@@ -5,18 +5,20 @@ import jQuery.JQuery;
 using Lambda;
 using org.casalib.util.StringUtil;
 using StringTools;
+using Reflect;
 
 typedef Function = {
 	name:String,
 	args:Array<Var>,
 	ret:String,
-	isStatic:Bool
+	isStatic:Bool,
+	?comment:String
 }
 
 typedef Var = {
 	name:String, 
 	type:String,
-	isStatic:Bool
+	?isStatic:Bool
 }
 
 class JavaToHaxe {
@@ -81,8 +83,7 @@ class JavaToHaxe {
 		
 		return {
 			name: r.matched(2),
-			type: mapType(r.matched(1)),
-			isStatic: false
+			type: mapType(r.matched(1))
 		}
 	}
 	
@@ -97,7 +98,7 @@ class JavaToHaxe {
 	 * Format Function.
 	 */
 	static public function formatFunction(f:Function):String {
-		return (f.isStatic ? "static " : "") + "public function " + f.name + "(" + f.args.map(formatVar).join(", ") + "):" + f.ret + ";";
+		return (f.hasField("isStatic") && f.isStatic ? "static " : "") + "public function " + f.name + "(" + f.args.map(formatVar).join(", ") + "):" + f.ret + ";";
 	}
 	/*
 	 * Format Function as @:overload.
@@ -162,24 +163,29 @@ class JavaToHaxe {
 	
 	static public function formatFunctions(fs:Array<Function>):String {
 		fs.sort(sortFunctions);
-		var methodsStr = "\t";
-		var basic = "";
-		var overload = "";
-		for (i in 0...fs.length) {
-			if (basic == "") {
-				if (i == fs.length-1) {
-					methodsStr += formatFunction(fs[i]) + "\n\t\n\t";
-				} else if (fs[i].name == fs[i+1].name) {
-					basic = formatFunction(fs[i]) + "\n\t\n\t";
-				} else {
-					methodsStr += formatFunction(fs[i]) + "\n\t\n\t";
-				}
+		
+		var fsgroup = new Array<Array<Function>>();
+		var g = new Array<Function>();
+		for (f in fs) {
+			if (g.length == 0 || g[0].name == f.name) {
+				g.push(f);
 			} else {
-				overload += formatFunctionOverload(fs[i]) + "\n\t";
-				if (i == fs.length-1 || fs[i].name != fs[i+1].name) {
-					methodsStr += overload + basic;
-					basic = overload = "";
+				fsgroup.push(g);
+				g = [f];
+			}
+		}
+		fsgroup.push(g);
+		
+		var methodsStr = "\t";
+		for (g in fsgroup) {
+			if (g.length == 1) {
+				methodsStr += formatFunction(g[0]) + "\n\t\n\t";
+			} else if (g.length > 1) {
+				var overload = "";
+				for (i in 1...g.length) {
+					overload += formatFunctionOverload(g[i]) + "\n\t";
 				}
+				methodsStr += overload + formatFunction(g[0]) + "\n\t\n\t";
 			}
 		}
 		return methodsStr;
@@ -291,7 +297,7 @@ class JavaToHaxe {
 		var out = "package " + classPack + ";\n\n" +
 			"#if !jvm private typedef Single = Float; #end\n\n" +
 			"extern " + classType + " " + className + " {\n\n" + 
-			fieldsStr + "\n" +
+			fieldsStr + "\n\n" +
 			(newsStr.length > 1 ? newsStr + "\n" : "") + 
 			methodsStr + "\n" +
 			"}";

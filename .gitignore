@@ -1,4 +1,5 @@
 bin/*.js
+bin/*.js.map
 
 .DS_Store
 *.pidb
