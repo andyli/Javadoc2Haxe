@@ -191,7 +191,9 @@ class JavaToHaxe {
 		return methodsStr;
 	}
 	
-	static public function main():Void {	
+	static public function main():Void {
+		if (!isJavadocClassPage()) return;
+		
 		var classFrame = new JQuery("body");
 		
 		var classH2 = classFrame.find("h2:first");
@@ -313,7 +315,5 @@ class JavaToHaxe {
 		
 		textarea.focus();
 		textarea.select();
-		
-		//Lib.alert(newsStr + "\n\n" + methodsStr);
 	}
 }

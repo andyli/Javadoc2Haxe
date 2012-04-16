@@ -19,11 +19,9 @@ class Background {
 	}
 	
 	static function onClick(tab:chrome.Tab):Void {
-		chrome.Tabs.sendRequest(tab.id, loadJavaToHaxe, null);
-		/*
 		chrome.Tabs.executeScript(tab.id, cast {
 			file: "javatohaxe.js",
 			allFrames: true
-		});*/
+		});
 	}
 }

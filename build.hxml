@@ -3,6 +3,8 @@
 -lib jQueryExtern
 -lib chrome-extension
 -lib casalib
+--dead-code-elimination
+--js-modern
 -main javadoc2haxe.Background
 
 --next
@@ -11,6 +13,8 @@
 -lib jQueryExtern
 -lib chrome-extension
 -lib casalib
+--dead-code-elimination
+--js-modern
 -main javadoc2haxe.ContentScript
 
 --next
@@ -19,4 +23,6 @@
 -lib jQueryExtern
 -lib chrome-extension
 -lib casalib
+--dead-code-elimination
+--js-modern
 -main javadoc2haxe.JavaToHaxe

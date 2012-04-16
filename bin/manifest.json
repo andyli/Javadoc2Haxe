@@ -23,7 +23,6 @@
 	],
 	"permissions": [
 		"tabs",
-		"webNavigation",
 		"http://*/*",
 		"https://*/*",
 		"file://*/*"
