@@ -18,7 +18,8 @@ typedef Function = {
 typedef Var = {
 	name:String, 
 	type:String,
-	?isStatic:Bool
+	?isStatic:Bool,
+	?comment:String
 }
 
 class JavaToHaxe {
@@ -98,13 +99,18 @@ class JavaToHaxe {
 	 * Format Function.
 	 */
 	static public function formatFunction(f:Function):String {
-		return (f.hasField("isStatic") && f.isStatic ? "static " : "") + "public function " + f.name + "(" + f.args.map(formatVar).join(", ") + "):" + f.ret + ";";
+		return 
+			(f.hasField("comment") && f.comment.length > 0 ? "/* " + f.comment + " */\n\t" : "") + 
+			(f.hasField("isStatic") && f.isStatic ? "static " : "") + "public function " + f.name + "(" + f.args.map(formatVar).join(", ") + "):" + f.ret + ";";
 	}
+	
 	/*
 	 * Format Function as @:overload.
 	 */
 	static public function formatFunctionOverload(f:Function):String {
-		return "@:overload(function(" + f.args.map(formatVar).join(", ") + "):" + f.ret + "{})";
+		return 
+			(f.hasField("comment") && f.comment.length > 0 ? "/* " + f.comment + " */\n\t" : "") + 
+			"@:overload(function(" + f.args.map(formatVar).join(", ") + "):" + f.ret + "{})";
 	}
 	
 	static function argTypeIsDynamic(a:Var):Bool {
@@ -202,6 +208,29 @@ class JavaToHaxe {
 		var className = c.name;
 		var classType = c.classTypes.join(" ");
 		
+		var children = classFrame.children();
+		var H2Next = children.eq(children.index(classH2)+1);
+		var superclass = if (H2Next.is("pre")) {
+			var sc:js.Dom.HtmlDom = cast new JQuery("h2~pre:first")[0];
+			var supers = new JQuery(sc.childNodes).toArray()
+				.map(function(v) return JQuery._static.trim(new JQuery(v).text()))
+				.filter(function(v) return v.length > 0)
+				.array();
+			supers[supers.length-2];
+		} else {
+			null;
+		}
+		superclass = superclass == null || superclass == "java.lang.Object" ? null: mapType(superclass);
+		
+		var interfaceStr:String = classFrame.find("dl:contains('All Implemented Interfaces') dd").text();
+		var interfaces:List<String> = interfaceStr.split(",")
+			.filter(function(c) return c.length > 0)
+			.map(function(c) return "implements " + mapType(c.trim()));
+		if (superclass != null) {
+			interfaces.push("extends " + superclass);
+		}
+		interfaceStr = interfaces.join(", ");
+		
 		/*
 		 * Fields
 		 */
@@ -222,14 +251,21 @@ class JavaToHaxe {
 			var name = new JQuery(v).find("td:nth-child(2) code:first").text().trim();
 			name = removeExtraSpaces(name);
 			
+			var comment:String = new JQuery(v).find("td:nth-child(2)").text();
+			comment = removeExtraSpaces(comment.substr(comment.indexOf(name) + name.length)).trim();
+			
 			fields.push({
 				name: name,
 				type: type,
-				isStatic: isStatic
+				isStatic: isStatic,
+				comment: comment
 			});	
 		});
 		fields.sort(sortVar);
-		var fieldsStr = fields.map(function(f) return (f.isStatic ? "static " : "") + "public var " + f.name + ":" + f.type + ";").join("\n\t");
+		var fieldsStr = fields.map(function(f) return 
+			(f.hasField("comment") && f.comment.length > 0 ? "/* " + f.comment + " */\n\t" : "") + 
+			(f.isStatic ? "static " : "") + "public var " + f.name + ":" + f.type + ";"
+		).join("\n\t");
 		
 		/*
 		 * Methods
@@ -249,19 +285,25 @@ class JavaToHaxe {
 			returnType = removeExtraSpaces(returnType);
 			returnType = mapType(returnType);
 			
-			var fun = new JQuery(v).find("td:nth-child(2) code:first").text().trim();
-			fun = removeExtraSpaces(fun);
+			var fun = new JQuery(v).find("td:nth-child(2) code:first").text();
+			
+			var comment:String = new JQuery(v).find("td:nth-child(2)").text();
+			comment = removeExtraSpaces(comment.substr(comment.indexOf(fun) + fun.length)).trim();
+			
+			fun = removeExtraSpaces(fun.trim());
 			
 			var rArgs = ~/\(.*\)/;
 			if (!rArgs.match(fun)) throw "Cannot find params of " + fun;
 			var args = rArgs.matched(0);
 			args = args.substr(1, args.length-2);
 			
+			
 			methods.push({
 				name: fun.substr(0, fun.indexOf("(")).trim(),
 				args: args.length > 0 ? args.split(",").map(processVar).array() : [],
 				ret: returnType,
-				isStatic: isStatic
+				isStatic: isStatic,
+				comment: comment
 			});	
 		});
 		
@@ -277,8 +319,12 @@ class JavaToHaxe {
 			
 		    var returnType = "Void";
 			
-			var fun = new JQuery(v).find("td:nth-child(1) code:first").text().trim();
-			fun = removeExtraSpaces(fun);
+			var fun = new JQuery(v).find("td:nth-child(1) code:first").text();
+			
+			var comment:String = new JQuery(v).find("td:nth-child(1)").text();
+			comment = removeExtraSpaces(comment.substr(comment.indexOf(fun) + fun.length)).trim();
+			
+			fun = removeExtraSpaces(fun.trim());
 			
 			var rArgs = ~/\(.*\)/;
 			if (!rArgs.match(fun)) throw "Cannot find params of " + fun;
@@ -289,7 +335,8 @@ class JavaToHaxe {
 				name: "new",
 				args: args.length > 0 ? args.split(",").map(processVar).array() : [],
 				ret: "Void",
-				isStatic: false
+				isStatic: false,
+				comment: comment
 			});	
 		
 		});
@@ -298,7 +345,7 @@ class JavaToHaxe {
 		
 		var out = "package " + classPack + ";\n\n" +
 			"#if !jvm private typedef Single = Float; #end\n\n" +
-			"extern " + classType + " " + className + " {\n\n" + 
+			"extern " + classType + " " + className + " " + interfaceStr +" {\n\n\t" + 
 			fieldsStr + "\n\n" +
 			(newsStr.length > 1 ? newsStr + "\n" : "") + 
 			methodsStr + "\n" +
