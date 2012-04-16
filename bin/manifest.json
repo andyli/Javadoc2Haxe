@@ -28,6 +28,7 @@
 		"file://*/*"
 	],
 	"icons" : {
-		"48" : "Javadoc2Haxe-logo-48.png"
+		"48" : "Javadoc2Haxe-logo-48.png",
+		"128" : "Javadoc2Haxe-logo-128.png"
 	}
 }
