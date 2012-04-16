@@ -6,7 +6,7 @@ import javadoc2haxe.Request;
 
 class ContentScript {	
 	static function main():Void {
-		if (JavaToHaxe.isJavadocClassPage()) {
+		if (Javadoc2Haxe.isJavadocClassPage()) {
 			chrome.Extension.sendRequest(showPageAction);
 			
 			new JQuery(Lib.window).bind('beforeunload', function(){ 

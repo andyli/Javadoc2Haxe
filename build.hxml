@@ -18,11 +18,11 @@
 -main javadoc2haxe.ContentScript
 
 --next
--js bin/javatohaxe.js
+-js bin/javadoc2haxe.js
 -cp src
 -lib jQueryExtern
 -lib chrome-extension
 -lib casalib
 --dead-code-elimination
 --js-modern
--main javadoc2haxe.JavaToHaxe
+-main javadoc2haxe.Javadoc2Haxe

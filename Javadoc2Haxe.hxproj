@@ -22,7 +22,7 @@
     <Compile Include="src\javadoc2haxe\Background.hx" />
     <Compile Include="src\javadoc2haxe\ContentScript.hx" />
     <Compile Include="src\javadoc2haxe\Request.hx" />
-    <Compile Include="src\javadoc2haxe\JavaToHaxe.hx" />
+    <Compile Include="src\javadoc2haxe\Javadoc2Haxe.hx" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\javadoc2haxe\" />

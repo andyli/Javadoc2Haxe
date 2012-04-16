@@ -20,7 +20,7 @@ class Background {
 	
 	static function onClick(tab:chrome.Tab):Void {
 		chrome.Tabs.executeScript(tab.id, cast {
-			file: "javatohaxe.js",
+			file: "javadoc2haxe.js",
 			allFrames: true
 		});
 	}

@@ -22,7 +22,7 @@ typedef Var = {
 	?comment:String
 }
 
-class JavaToHaxe {
+class Javadoc2Haxe {
 	static function __init__():Void {
 		haxe.macro.Tools.includeFile("jquery-1.7.2.min.js");
 		haxe.macro.Tools.includeFile("jquery-ui-1.8.18.custom.min.js");
@@ -309,7 +309,6 @@ class JavaToHaxe {
 		
 		var methodsStr = formatFunctions(methods);
 		
-		
 		/*
 		 * Constructors
 		 */
@@ -352,7 +351,7 @@ class JavaToHaxe {
 			"}";
 		
 		new JQuery('head').append(new JQuery('<link rel="stylesheet" type="text/css" />').attr('href', "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/ui-lightness/jquery-ui.css"));
-		var dialog = new JQuery('<div title="JavaToHaxe output"></div>');
+		var dialog = new JQuery('<div title="Javadoc2Haxe output"></div>');
 		var textarea:JQuery = new JQuery('<textarea>'+out+'</textarea>').width("100%").height("100%").appendTo(dialog);
 		untyped dialog.appendTo(classFrame).dialog({
 			width: 800,

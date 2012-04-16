@@ -2,7 +2,7 @@
 	"name": "Javadoc2Haxe",
 	"version": "0.1",
 	"manifest_version": 2,
-	"description": "Create a Java lib extern for Haxe in one-click. Visit a Javadoc class page, click on this extension's button and experience the magic.",
+	"description": "Visit a Javadoc class page, create a Java extern for Haxe in one-click.",
 	"background" : {
 		"scripts": ["background.js"]
 	},
@@ -13,8 +13,7 @@
 		{
 			"matches" : [
 				"http://*/*",
-				"https://*/*",
-				"file://*/*"
+				"https://*/*"
 			],
 			"js" : ["contentscript.js"],
 			"run_at" : "document_idle",
@@ -24,8 +23,7 @@
 	"permissions": [
 		"tabs",
 		"http://*/*",
-		"https://*/*",
-		"file://*/*"
+		"https://*/*"
 	],
 	"icons" : {
 		"48" : "Javadoc2Haxe-logo-48.png",
