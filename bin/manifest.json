@@ -2,7 +2,7 @@
 	"name": "Javadoc2Haxe",
 	"version": "0.1",
 	"manifest_version": 2,
-	"description": "Create a Java lib extern for Haxe in one-click. Visit a Javadoc page, click on this extension's button and experience the magic.",
+	"description": "Create a Java lib extern for Haxe in one-click. Visit a Javadoc class page, click on this extension's button and experience the magic.",
 	"background" : {
 		"scripts": ["background.js"]
 	},
