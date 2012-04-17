@@ -235,12 +235,12 @@ class Javadoc2Haxe {
 		 * Fields
 		 */
 		var fields = new Array<Var>();
-		classFrame.find("table").has("tr:contains('Field Summary')").find("tr").each(function(i, v){
+		classFrame.find("table").has("tr:contains('Field Summary')").children("tbody").children("tr").each(function(i, v){
 			if (new JQuery(v).find("code").length == 0) return;
 			
 		    var type:String = removeExtraSpaces(new JQuery(v).find("td:nth-child(1) code").text()).trim();
 		    
-		    var rStatic = ~/static\s/;
+		    var rStatic = ~/static\s+/;
 		    var isStatic = rStatic.match(type);
 		    if (isStatic) {
 		    	type = rStatic.replace(type, "");
@@ -271,21 +271,32 @@ class Javadoc2Haxe {
 		 * Methods
 		 */
 		var methods = new Array<Function>();
-		classFrame.find("table").has("tr:contains('Method Summary')").find("tr").each(function(i, v){
+		classFrame.find("table").has("tr:contains('Method Summary')").children("tbody").children("tr").each(function(i, v){
 			if (new JQuery(v).find("code").length == 0) return;
 			
-		    var returnType:String = removeExtraSpaces(new JQuery(v).find("td:nth-child(1) code").text()).trim();
-		    
-		    var rStatic = ~/static\s/;
+		    var returnType:String = removeExtraSpaces(new JQuery(v).find("td:nth-child(1) code:first").text()).trim();
+		    trace(returnType);
+		    var rStatic = ~/static\s+/;
 		    var isStatic = rStatic.match(returnType);
 		    if (isStatic) {
 		    	returnType = rStatic.replace(returnType, "");
 		    }
+		    
+		    var rTypeParam = ~/<[^>]*>\s+/;
+		    var hasTypeParam = rTypeParam.match(returnType);
+		    var typeParamName = "";
+		    if (hasTypeParam) {
+		    	typeParamName = rTypeParam.matched(0).trim();
+		    	returnType = rTypeParam.replace(returnType, "");
+		    }
+		    
 		    returnType = returnType.remove("abstract ");
 			returnType = removeExtraSpaces(returnType);
 			returnType = mapType(returnType);
-			
+			trace(returnType);
 			var fun = new JQuery(v).find("td:nth-child(2) code:first").text();
+			
+			trace(fun);
 			
 			var comment:String = new JQuery(v).find("td:nth-child(2)").text();
 			comment = removeExtraSpaces(comment.substr(comment.indexOf(fun) + fun.length)).trim();
@@ -299,7 +310,7 @@ class Javadoc2Haxe {
 			
 			
 			methods.push({
-				name: fun.substr(0, fun.indexOf("(")).trim(),
+				name: fun.substr(0, fun.indexOf("(")).trim() + typeParamName,
 				args: args.length > 0 ? args.split(",").map(processVar).array() : [],
 				ret: returnType,
 				isStatic: isStatic,
@@ -313,7 +324,7 @@ class Javadoc2Haxe {
 		 * Constructors
 		 */
 		var news = new Array<Function>();
-		classFrame.find("table").has("tr:contains('Constructor Summary')").find("tr").each(function(i, v){
+		classFrame.find("table").has("tr:contains('Constructor Summary')").children("tbody").children("tr").each(function(i, v){
 			if (new JQuery(v).find("code").length == 0) return;
 			
 		    var returnType = "Void";
