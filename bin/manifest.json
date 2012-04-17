@@ -1,11 +1,8 @@
 {
 	"name": "Javadoc2Haxe",
-	"version": "0.1",
+	"version": "0.1.1",
 	"manifest_version": 2,
 	"description": "Visit a Javadoc class page, create a Java extern for Haxe in one-click.",
-	"page_action": {
-		"default_icon": "Javadoc2Haxe-logo.png"
-	},
 	"content_scripts" : [
 		{
 			"matches" : [
