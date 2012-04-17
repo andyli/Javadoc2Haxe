@@ -275,7 +275,7 @@ class Javadoc2Haxe {
 			if (new JQuery(v).find("code").length == 0) return;
 			
 		    var returnType:String = removeExtraSpaces(new JQuery(v).find("td:nth-child(1) code:first").text()).trim();
-		    trace(returnType);
+		    
 		    var rStatic = ~/static\s+/;
 		    var isStatic = rStatic.match(returnType);
 		    if (isStatic) {
@@ -293,10 +293,8 @@ class Javadoc2Haxe {
 		    returnType = returnType.remove("abstract ");
 			returnType = removeExtraSpaces(returnType);
 			returnType = mapType(returnType);
-			trace(returnType);
-			var fun = new JQuery(v).find("td:nth-child(2) code:first").text();
 			
-			trace(fun);
+			var fun = new JQuery(v).find("td:nth-child(2) code:first").text();
 			
 			var comment:String = new JQuery(v).find("td:nth-child(2)").text();
 			comment = removeExtraSpaces(comment.substr(comment.indexOf(fun) + fun.length)).trim();
