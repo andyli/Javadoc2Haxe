@@ -19,9 +19,7 @@
     <Compile Include="bin\index.html" />
     <Compile Include="build.hxml" />
     <Compile Include="bin\manifest.json" />
-    <Compile Include="src\javadoc2haxe\Background.hx" />
     <Compile Include="src\javadoc2haxe\ContentScript.hx" />
-    <Compile Include="src\javadoc2haxe\Request.hx" />
     <Compile Include="src\javadoc2haxe\Javadoc2Haxe.hx" />
   </ItemGroup>
   <ItemGroup>
