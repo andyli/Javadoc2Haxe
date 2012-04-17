@@ -29,9 +29,9 @@ class Javadoc2Haxe {
 	}
 	
 	static public function isJavadocClassPage():Bool {
-		return	(new JQuery("th:contains('Constructor Summary')").length == 1 ||
-				new JQuery("th:contains('Method Summary')").length == 1 ||
-				new JQuery("th:contains('Field Summary')").length == 1) &&
+		return	(new JQuery("tr:contains('Constructor Summary')").length == 1 ||
+				new JQuery("tr:contains('Method Summary')").length == 1 ||
+				new JQuery("tr:contains('Field Summary')").length == 1) &&
 				new JQuery("b:contains('Class')").length > 0;
 				
 	}
