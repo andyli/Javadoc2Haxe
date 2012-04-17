@@ -21,6 +21,7 @@
     <Compile Include="bin\manifest.json" />
     <Compile Include="src\javadoc2haxe\ContentScript.hx" />
     <Compile Include="src\javadoc2haxe\Javadoc2Haxe.hx" />
+    <Compile Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\javadoc2haxe\" />
