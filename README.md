@@ -1,5 +1,9 @@
 # Javadoc2Haxe
 
+## Install
+
+[Install Javadoc2Haxe from Chrome store.](https://chrome.google.com/webstore/detail/apgbpdhjnmdmcdjfdffpemjaflcnjjef)
+
 ## Usage
 
 Create a [Haxe](http://haxe.org)/Java extern for a Java class by:
