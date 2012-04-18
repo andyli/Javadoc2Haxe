@@ -256,7 +256,15 @@ class Javadoc2Haxe {
 		}
 		superclass = superclass == null || superclass == "java.lang.Object" ? null: mapType(superclass);
 		
-		var interfaceStr:String = classFrame.find("dl:contains('nterfaces'):first dd").text();
+		var interfacesDd = classFrame.find("dl:contains('nterfaces'):first dd");
+		interfacesDd.find("a").each(function(i, e){
+			var j = new JQuery(e);
+			if (j.attr("title").length > 0) {
+				j.text(~/.*\s+in\s+/.replace(j.attr("title"), "") + "." + j.text());
+			}
+		});
+		
+		var interfaceStr:String = interfacesDd.text();
 		var interfaces:List<String> = interfaceStr.split(",")
 			.filter(function(c) return c.length > 0)
 			.map(function(c) return "implements " + mapType(c.trim()));
