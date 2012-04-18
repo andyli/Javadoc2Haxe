@@ -260,7 +260,9 @@ class Javadoc2Haxe {
 		interfacesDd.find("a").each(function(i, e){
 			var j = new JQuery(e);
 			if (j.attr("title").length > 0) {
-				j.text(~/.*\s+in\s+/.replace(j.attr("title"), "") + "." + j.text());
+				var pack = ~/.*\s+in\s+/.replace(j.attr("title"), "");
+				if (j.text().indexOf(pack) == -1)
+					j.text(pack + "." + j.text());
 			}
 		});
 		

@@ -1,6 +1,6 @@
 {
 	"name": "Javadoc2Haxe",
-	"version": "0.1.3",
+	"version": "0.1.3.1",
 	"manifest_version": 2,
 	"description": "Visit a Javadoc class page, create a Java extern for Haxe in one-click.",
 	"content_scripts" : [
