@@ -57,7 +57,8 @@ class Javadoc2Haxe {
 	 * Map Java type to Haxe type
 	 */
 	static public function mapType(t:String):String {
-		return switch(JQuery._static.trim(t)) {
+		t = JQuery._static.trim(t);
+		return switch(t) {
 			case "byte": "Int"; //"Int8";
 			case "short": "Int"; //"Int16";
 			case "int": "Int";
@@ -70,6 +71,8 @@ class Javadoc2Haxe {
 			case "void": "Void";
 			case "Object", "java.lang.Object": "Dynamic";
 			default:
+				var rTypeParam = ~/[^<]*<(.+)>[\[\\]*/;
+				if (rTypeParam.match(t)) t = mapType(t.substr(0, t.indexOf("<")+1)) + mapType(rTypeParam.matched(1)) + t.substr(t.lastIndexOf(">"));
 				var array = t.lastIndexOf("[]");
 				array == -1 ? t : "jvm.NativeArray<" + mapType(t.substr(0, array)) + ">";
 		}
@@ -100,8 +103,8 @@ class Javadoc2Haxe {
 	 */
 	static public function formatFunction(f:Function):String {
 		return 
-			(f.hasField("comment") && f.comment.length > 0 ? "/* " + f.comment + " */\n\t" : "") + 
-			(f.hasField("isStatic") && f.isStatic ? "static " : "") + "public function " + f.name + "(" + f.args.map(formatVar).join(", ") + "):" + f.ret + ";";
+			(f.comment != null && f.comment.length > 0 ? "/* " + f.comment + " */\n\t" : "") + 
+			(f.isStatic != null && f.isStatic ? "static " : "") + "public function " + f.name + "(" + f.args.map(formatVar).join(", ") + "):" + f.ret + ";";
 	}
 	
 	/*
@@ -109,7 +112,7 @@ class Javadoc2Haxe {
 	 */
 	static public function formatFunctionOverload(f:Function):String {
 		return 
-			(f.hasField("comment") && f.comment.length > 0 ? "/* " + f.comment + " */\n\t" : "") + 
+			(f.comment != null && f.comment.length > 0 ? "/* " + f.comment + " */\n\t" : "") + 
 			"@:overload(function(" + f.args.map(formatVar).join(", ") + "):" + f.ret + "{})";
 	}
 	
@@ -124,7 +127,10 @@ class Javadoc2Haxe {
 		to;
 	}
 	
-	static public function sortArgs(a0:Array<Var>, a1:Array<Var>):Int {
+	/*
+	 * Sort arguments of a function so that more "Dynamic" ones come last.
+	 */
+	static public function compareArgs(a0:Array<Var>, a1:Array<Var>):Int {
 		for (i in 0...a0.length) {
 			var v0 = typeOrder.indexOf(a0[i].type);
 			if (v0 == -1 && a0[i].type == "Dynamic") v0 = -2;
@@ -146,29 +152,39 @@ class Javadoc2Haxe {
 	/*
 	 * Sort Functions so that more "Dynamic" ones come last.
 	 */
-	static public function sortFunctions(f0:Function, f1:Function):Int {
+	static public function compareFunctions(f0:Function, f1:Function):Int {
 		var n = Reflect.compare(f0.name, f1.name);
 		return n != 0 ? n : 
 			f0.args.length == f1.args.length ? 
-				sortArgs(f0.args, f1.args) : 
+				compareArgs(f0.args, f1.args) : 
 				f0.args.length - f1.args.length;
 	}
 	
-	static public function extractClassType(c:String):{ classTypes:Array<String>, name:String } {
+	/*
+	 * Extract class types from something like "public class MyClass<T>" as { classTypes:["class"], name:"MyClass", typeParam:"T" }
+	 */
+	static public function extractClassType(c:String):{ classTypes:Array<String>, name:String, ?typeParam:String } {
 		var a = [];
 		var classDef = ~/[\s]+/.split(c).filter(function(s) return s.length > 0);
 		for (n in classDef) {
-			switch(n) {
+			switch(n.toLowerCase()) {
 				case "abstract":
-				case "Class": a.push("class");
-				case "Interface": a.push("interface");
+				case "class": a.push("class");
+				case "interface": a.push("interface");
 			}
 		}
-		return { classTypes:a.array(), name:classDef.last() }
+		var name = classDef.last();
+		
+		var rTypeParam = ~/[^<]*<(.+)>/;
+		
+		if (rTypeParam.match(name))
+			return { classTypes:a.array(), name:name.substr(0, name.indexOf("<")), typeParam:rTypeParam.matched(1) }
+		else
+			return { classTypes:a.array(), name:name };
 	}
 	
 	static public function formatFunctions(fs:Array<Function>):String {
-		fs.sort(sortFunctions);
+		fs.sort(compareFunctions);
 		
 		var fsgroup = new Array<Array<Function>>();
 		var g = new Array<Function>();
@@ -204,9 +220,10 @@ class Javadoc2Haxe {
 		
 		var classH2 = classFrame.find("h2:first");
 		var classPack = JQuery._static.trim(classH2.find("font").text());
-		var c = extractClassType(removeExtraSpaces(JQuery._static.trim(classH2.text().replace(classPack, ""))));
+		var c = extractClassType(JQuery._static.trim(classH2.text().replace(classPack, "")));
 		var className = c.name;
 		var classType = c.classTypes.join(" ");
+		var classTypeParam = c.typeParam;
 		
 		var children = classFrame.children();
 		var H2Next = children.eq(children.index(classH2)+1);
@@ -216,13 +233,23 @@ class Javadoc2Haxe {
 				.map(function(v) return JQuery._static.trim(new JQuery(v).text()))
 				.filter(function(v) return v.length > 0)
 				.array();
-			supers[supers.length-2];
+			var idx = supers.length-2;
+			var last = supers[idx];
+			if (last.indexOf(">") != -1) {
+				while (last.indexOf("<") == -1) {
+					last = supers[--idx] + last;
+				}
+				trace(last);
+				last = supers[--idx] + last;
+				trace(last);
+			}
+			last;
 		} else {
 			null;
 		}
 		superclass = superclass == null || superclass == "java.lang.Object" ? null: mapType(superclass);
 		
-		var interfaceStr:String = classFrame.find("dl:contains('All Implemented Interfaces') dd").text();
+		var interfaceStr:String = classFrame.find("dl:contains('nterfaces'):first dd").text();
 		var interfaces:List<String> = interfaceStr.split(",")
 			.filter(function(c) return c.length > 0)
 			.map(function(c) return "implements " + mapType(c.trim()));
@@ -263,7 +290,7 @@ class Javadoc2Haxe {
 		});
 		fields.sort(sortVar);
 		var fieldsStr = fields.map(function(f) return 
-			(f.hasField("comment") && f.comment.length > 0 ? "/* " + f.comment + " */\n\t" : "") + 
+			(f.comment != null && f.comment.length > 0 ? "/* " + f.comment + " */\n\t" : "") + 
 			(f.isStatic ? "static " : "") + "public var " + f.name + ":" + f.type + ";"
 		).join("\n\t");
 		
@@ -353,7 +380,7 @@ class Javadoc2Haxe {
 		
 		var out = "package " + classPack + ";\n\n" +
 			"#if !jvm private typedef Single = Float; #end\n\n" +
-			"extern " + classType + " " + className + " " + interfaceStr +" {\n\n\t" + 
+			"extern " + classType + " " + className + (classTypeParam != null ? "<" + classTypeParam + ">" : "") + " " + interfaceStr +" {\n\n\t" + 
 			fieldsStr + "\n\n" +
 			(newsStr.length > 1 ? newsStr + "\n" : "") + 
 			methodsStr + "\n" +
