@@ -5,7 +5,6 @@ import jQuery.JQuery;
 using Lambda;
 using org.casalib.util.StringUtil;
 using StringTools;
-using Reflect;
 
 typedef Function = {
 	name:String,
@@ -54,7 +53,8 @@ class Javadoc2Haxe {
 	}
 	
 	/*
-	 * Map Java type to Haxe type
+	 * Map Java type to Haxe type.
+	 * Eg. java.lang.String[][] => jvm.NativeArray<jvm.NativeArray<String>>
 	 */
 	static public function mapType(t:String):String {
 		t = JQuery._static.trim(t);
@@ -116,10 +116,6 @@ class Javadoc2Haxe {
 			"@:overload(function(" + f.args.map(formatVar).join(", ") + "):" + f.ret + "{})";
 	}
 	
-	static function argTypeIsDynamic(a:Var):Bool {
-		return a.type == "Dynamic";
-	}
-	
 	static var typeOrder = {
 		var t = ["Void", "Bool", "Int", "Int8", "Char16", "Int16", "Int64", "Single", "Float", "String"];
 		var to = t.concat(t.map(function(s) return "jvm.NativeArray<" + s + ">").array());
@@ -143,14 +139,14 @@ class Javadoc2Haxe {
 	}
 	
 	/*
-	 * Sort Vars(fields)
+	 * Compare Vars(fields)
 	 */
 	static public function sortVar(f0:Var, f1:Var):Int {
 		return Reflect.compare(f0.name, f1.name);
 	}
 	
 	/*
-	 * Sort Functions so that more "Dynamic" ones come last.
+	 * Compare Functions so that more "Dynamic" ones come last.
 	 */
 	static public function compareFunctions(f0:Function, f1:Function):Int {
 		var n = Reflect.compare(f0.name, f1.name);
@@ -183,6 +179,17 @@ class Javadoc2Haxe {
 			return { classTypes:a.array(), name:name };
 	}
 	
+	/*
+	 * Format an Array of Functions into:
+	 * 
+	 *  @:overload(function():DiffType)
+	 *  public function myFun():Type;
+	 *  
+	 *  @:overload(function():DiffType)
+	 *  public function myFun2():Type;
+	 *  ...
+	 *
+	 */
 	static public function formatFunctions(fs:Array<Function>):String {
 		fs.sort(compareFunctions);
 		
