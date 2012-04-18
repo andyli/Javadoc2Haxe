@@ -336,6 +336,7 @@ class Javadoc2Haxe {
 		    }
 		    
 		    returnType = returnType.remove("abstract ");
+		    returnType = returnType.remove("protected ");
 			returnType = removeExtraSpaces(returnType);
 			returnType = mapType(returnType);
 			
@@ -372,7 +373,7 @@ class Javadoc2Haxe {
 			
 		    var returnType = "Void";
 			
-			var fun = new JQuery(v).find("td:nth-child(1) code:first").text();
+			var fun = new JQuery(v).find("td:last code:first").text();
 			
 			var comment:String = new JQuery(v).find("td:nth-child(1)").text();
 			comment = removeExtraSpaces(comment.substr(comment.indexOf(fun) + fun.length)).trim();
