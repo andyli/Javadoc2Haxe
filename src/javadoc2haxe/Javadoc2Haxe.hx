@@ -225,18 +225,22 @@ class Javadoc2Haxe {
 		
 		var classFrame = new JQuery("body");
 		
+		
+		
+		var classH2 = classFrame.find("h2:first");
+		var classPack = JQuery._static.trim(classH2.find("font").text());
+		
+		//turn every <a title="class in my.pack">SomeClass</a> into<a title="class in my.pack">my.pack.SomeClass</a>
 		var rTitlePack = ~/^(interface|class) in /;
 		new JQuery("a[title]").each(function(i, e){
 			var j = new JQuery(e);
 			if (rTitlePack.match(j.attr("title")) && j.children().length == 0) {
 				var pack = rTitlePack.replace(j.attr("title"), "");
-				if (j.text().indexOf(pack) == -1)
+				if (classPack != pack && j.text().indexOf(pack) == -1)
 					j.text(pack + "." + j.text());
 			}
 		});
 		
-		var classH2 = classFrame.find("h2:first");
-		var classPack = JQuery._static.trim(classH2.find("font").text());
 		var c = extractClassType(JQuery._static.trim(classH2.text().replace(classPack, "")));
 		var className = c.name;
 		var classType = c.classTypes.join(" ");
