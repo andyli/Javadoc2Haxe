@@ -54,7 +54,7 @@ class Javadoc2Haxe {
 	
 	/*
 	 * Map Java type to Haxe type.
-	 * Eg. java.lang.String[][] => jvm.NativeArray<jvm.NativeArray<String>>
+	 * Eg. java.lang.String[][] => java.NativeArray<java.NativeArray<String>>
 	 */
 	static public function mapType(t:String):String {
 		t = JQuery._static.trim(t);
@@ -74,7 +74,7 @@ class Javadoc2Haxe {
 				var rTypeParam = ~/[^<]*<(.+)>[\[\\]*/;
 				if (rTypeParam.match(t)) t = mapType(t.substr(0, t.indexOf("<")+1)) + mapType(rTypeParam.matched(1)) + t.substr(t.lastIndexOf(">"));
 				var array = t.lastIndexOf("[]");
-				array == -1 ? t : "jvm.NativeArray<" + mapType(t.substr(0, array)) + ">";
+				array == -1 ? t : "java.NativeArray<" + mapType(t.substr(0, array)) + ">";
 		}
 	}
 	
@@ -118,7 +118,7 @@ class Javadoc2Haxe {
 	
 	static var typeOrder = {
 		var t = ["Void", "Bool", "Int", "Int8", "Char16", "Int16", "Int64", "Single", "Float", "String"];
-		var to = t.concat(t.map(function(s) return "jvm.NativeArray<" + s + ">").array());
+		var to = t.concat(t.map(function(s) return "java.NativeArray<" + s + ">").array());
 		to.reverse();
 		to;
 	}
@@ -402,7 +402,7 @@ class Javadoc2Haxe {
 		var newsStr = formatFunctions(news);
 		
 		var out = "package " + classPack + ";\n\n" +
-			"#if !jvm private typedef Single = Float; #end\n\n" +
+			"#if !java private typedef Single = Float; #end\n\n" +
 			"extern " + classType + " " + className + (classTypeParam != null ? "<" + classTypeParam + ">" : "") + " " + interfaceStr +" {\n\n\t" + 
 			fieldsStr + "\n\n" +
 			(newsStr.length > 1 ? newsStr + "\n" : "") + 
