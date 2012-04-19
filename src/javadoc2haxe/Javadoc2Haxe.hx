@@ -52,7 +52,7 @@ class Javadoc2Haxe {
 		return str;
 	}
 	
-	/*
+	/**
 	 * Map Java type to Haxe type.
 	 * Eg. java.lang.String[][] => java.NativeArray<java.NativeArray<String>>
 	 */
@@ -78,7 +78,7 @@ class Javadoc2Haxe {
 		}
 	}
 	
-	/*
+	/**
 	 * Format "int value" into Var
 	 */
 	static public function processVar(a:String):Var {
@@ -91,28 +91,28 @@ class Javadoc2Haxe {
 		}
 	}
 	
-	/*
+	/**
 	 * Format "int value" into "value:Int"
 	 */
 	static public function formatVar(a:Var):String {
 		return a.name + ":" + a.type;
 	}
 	
-	/*
+	/**
 	 * Format Function.
 	 */
 	static public function formatFunction(f:Function):String {
 		return 
-			(f.comment != null && f.comment.length > 0 ? "/* " + f.comment + " */\n\t" : "") + 
+			(f.comment != null && f.comment.length > 0 ? "/** " + f.comment + " */\n\t" : "") + 
 			(f.isStatic != null && f.isStatic ? "static " : "") + "public function " + f.name + "(" + f.args.map(formatVar).join(", ") + "):" + f.ret + ";";
 	}
 	
-	/*
+	/**
 	 * Format Function as @:overload.
 	 */
 	static public function formatFunctionOverload(f:Function):String {
 		return 
-			(f.comment != null && f.comment.length > 0 ? "/* " + f.comment + " */\n\t" : "") + 
+			(f.comment != null && f.comment.length > 0 ? "/** " + f.comment + " */\n\t" : "") + 
 			"@:overload(function(" + f.args.map(formatVar).join(", ") + "):" + f.ret + "{})";
 	}
 	
@@ -123,7 +123,7 @@ class Javadoc2Haxe {
 		to;
 	}
 	
-	/*
+	/**
 	 * Sort arguments of a function so that more "Dynamic" ones come last.
 	 */
 	static public function compareArgs(a0:Array<Var>, a1:Array<Var>):Int {
@@ -138,14 +138,14 @@ class Javadoc2Haxe {
 		return 0;
 	}
 	
-	/*
+	/**
 	 * Compare Vars(fields)
 	 */
 	static public function sortVar(f0:Var, f1:Var):Int {
 		return Reflect.compare(f0.name, f1.name);
 	}
 	
-	/*
+	/**
 	 * Compare Functions so that more "Dynamic" ones come last.
 	 */
 	static public function compareFunctions(f0:Function, f1:Function):Int {
@@ -156,7 +156,7 @@ class Javadoc2Haxe {
 				f0.args.length - f1.args.length;
 	}
 	
-	/*
+	/**
 	 * Extract class types from something like "public class MyClass<T>" as { classTypes:["class"], name:"MyClass", typeParam:"T" }
 	 */
 	static public function extractClassType(c:String):{ classTypes:Array<String>, name:String, ?typeParam:String } {
@@ -179,7 +179,7 @@ class Javadoc2Haxe {
 			return { classTypes:a.array(), name:name };
 	}
 	
-	/*
+	/**
 	 * Format an Array of Functions into:
 	 * 
 	 *  @:overload(function():DiffType)
@@ -280,7 +280,7 @@ class Javadoc2Haxe {
 		}
 		interfaceStr = interfaces.join(", ");
 		
-		/*
+		/**
 		 * Fields
 		 */
 		var fields = new Array<Var>();
@@ -312,11 +312,11 @@ class Javadoc2Haxe {
 		});
 		fields.sort(sortVar);
 		var fieldsStr = fields.map(function(f) return 
-			(f.comment != null && f.comment.length > 0 ? "/* " + f.comment + " */\n\t" : "") + 
+			(f.comment != null && f.comment.length > 0 ? "/** " + f.comment + " */\n\t" : "") + 
 			(f.isStatic ? "static " : "") + "public var " + f.name + ":" + f.type + ";"
 		).join("\n\t");
 		
-		/*
+		/**
 		 * Methods
 		 */
 		var methods = new Array<Function>();
@@ -368,7 +368,7 @@ class Javadoc2Haxe {
 		
 		var methodsStr = formatFunctions(methods);
 		
-		/*
+		/**
 		 * Constructors
 		 */
 		var news = new Array<Function>();
